@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { normalizeEmail, normalizeName, normalizePhone, normalizeRating, normalizeWebsite } from "@polza/shared";
+import {
+  normalizeEmail,
+  normalizeName,
+  normalizePhone,
+  normalizeRating,
+  normalizeWebsite,
+} from "@polza/shared";
 
 describe("normalizers", () => {
   it("normalizes company names", () => {
@@ -14,15 +20,21 @@ describe("normalizers", () => {
   });
 
   it("normalizes russian phone values", () => {
-    expect(normalizePhone("8 (913) 506-52-60").value?.e164).toBe("+79135065260");
+    expect(normalizePhone("8 (913) 506-52-60").value?.e164).toBe(
+      "+79135065260",
+    );
   });
 
   it("normalizes websites", () => {
-    expect(normalizeWebsite("www.example.com/path").value?.host).toBe("example.com");
+    expect(normalizeWebsite("www.example.com/path").value?.host).toBe(
+      "example.com",
+    );
   });
 
   it("returns email reason codes", () => {
-    expect(normalizeEmail("info@mailinator.com").value?.codes).toContain("EMAIL_DISPOSABLE");
+    expect(normalizeEmail("info@mailinator.com").value?.codes).toContain(
+      "EMAIL_DISPOSABLE",
+    );
     expect(normalizeEmail("bad@").issues[0]?.code).toBe("EMAIL_SYNTAX_INVALID");
   });
 });

@@ -65,7 +65,15 @@ export default async function CompaniesPage({ searchParams }: PageProps) {
                 <td>{company.city ?? "—"}</td>
                 <td className="num">{company.rating?.toFixed(1) ?? "—"}</td>
                 <td className="num">{company.reviewsCount ?? "—"}</td>
-                <td>{company.website ? <a href={company.website} rel="noopener noreferrer">{company.websiteHost}</a> : "—"}</td>
+                <td>
+                  {company.website ? (
+                    <a href={company.website} rel="noopener noreferrer">
+                      {company.websiteHost}
+                    </a>
+                  ) : (
+                    "—"
+                  )}
+                </td>
                 <td className="num">{company.phoneE164 ?? "—"}</td>
               </tr>
             ))}
@@ -74,19 +82,39 @@ export default async function CompaniesPage({ searchParams }: PageProps) {
       )}
 
       <nav className="pagination">
-        {parsed.page > 1 ? <Link href={pageHref(parsed.page - 1, rawParams)}>Назад</Link> : <span />}
-        <span className="num">Страница {parsed.page} из {totalPages}</span>
-        {parsed.page < totalPages ? <Link href={pageHref(parsed.page + 1, rawParams)}>Вперёд</Link> : <span />}
+        {parsed.page > 1 ? (
+          <Link href={pageHref(parsed.page - 1, rawParams)}>Назад</Link>
+        ) : (
+          <span />
+        )}
+        <span className="num">
+          Страница {parsed.page} из {totalPages}
+        </span>
+        {parsed.page < totalPages ? (
+          <Link href={pageHref(parsed.page + 1, rawParams)}>Вперёд</Link>
+        ) : (
+          <span />
+        )}
       </nav>
     </main>
   );
 }
 
-function flattenParams(params: Record<string, string | string[] | undefined>): Record<string, string> {
-  return Object.fromEntries(Object.entries(params).map(([key, value]) => [key, Array.isArray(value) ? value[0] ?? "" : value ?? ""]));
+function flattenParams(
+  params: Record<string, string | string[] | undefined>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? (value[0] ?? "") : (value ?? ""),
+    ]),
+  );
 }
 
-function pageHref(page: number, current: Record<string, string | string[] | undefined>): string {
+function pageHref(
+  page: number,
+  current: Record<string, string | string[] | undefined>,
+): string {
   const params = new URLSearchParams(flattenParams(current));
   params.set("page", String(page));
   return `/companies?${params.toString()}`;

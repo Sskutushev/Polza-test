@@ -5,9 +5,6 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "references": [
-    { "path": "../shared" },
-    { "path": "../db" }
-  ],
+  "references": [{ "path": "../shared" }, { "path": "../db" }],
   "include": ["src"]
 }

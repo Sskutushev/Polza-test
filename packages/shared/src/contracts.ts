@@ -5,7 +5,7 @@ import {
   normalizeName,
   normalizePhone,
   normalizeRating,
-  normalizeWebsite
+  normalizeWebsite,
 } from "./normalize.js";
 import type { Issue } from "./result.js";
 
@@ -37,18 +37,31 @@ function pick(raw: RawCompany, names: string[]): unknown {
   return null;
 }
 
-export function mapCompany(raw: RawCompany): { company: CompanyInput | null; issues: Issue[] } {
+export function mapCompany(raw: RawCompany): {
+  company: CompanyInput | null;
+  issues: Issue[];
+} {
   const issues: Issue[] = [];
-  const name = normalizeName(pick(raw, ["name", "title", "company", "company_name"]));
+  const name = normalizeName(
+    pick(raw, ["name", "title", "company", "company_name"]),
+  );
   issues.push(...name.issues);
   if (!name.value) return { company: null, issues };
 
   const city = normalizeCity(pick(raw, ["city", "town", "location"]));
   const rating = normalizeRating(pick(raw, ["rating", "rate", "stars"]));
-  const reviewsCount = normalizeCount(pick(raw, ["reviews_count", "review_count", "reviews", "numReviews"]));
+  const reviewsCount = normalizeCount(
+    pick(raw, ["reviews_count", "review_count", "reviews", "numReviews"]),
+  );
   const phone = normalizePhone(pick(raw, ["phone", "telephone", "tel"]));
   const website = normalizeWebsite(pick(raw, ["website", "site", "url"]));
-  issues.push(...city.issues, ...rating.issues, ...reviewsCount.issues, ...phone.issues, ...website.issues);
+  issues.push(
+    ...city.issues,
+    ...rating.issues,
+    ...reviewsCount.issues,
+    ...phone.issues,
+    ...website.issues,
+  );
 
   const category = pick(raw, ["category", "rubric", "type"]);
   const address = pick(raw, ["address", "addr"]);
@@ -57,7 +70,7 @@ export function mapCompany(raw: RawCompany): { company: CompanyInput | null; iss
     phoneE164: phone.value?.e164 ?? null,
     websiteHost: website.value?.host ?? null,
     nameNorm: name.value.nameNorm,
-    citySlug: city.value?.slug ?? null
+    citySlug: city.value?.slug ?? null,
   });
 
   return {
@@ -75,13 +88,18 @@ export function mapCompany(raw: RawCompany): { company: CompanyInput | null; iss
       phoneE164: phone.value?.e164 ?? null,
       phoneRaw: phone.value?.raw ?? null,
       dedupKey,
-      raw
+      raw,
     },
-    issues
+    issues,
   };
 }
 
-export function makeDedupKey(input: { phoneE164: string | null; websiteHost: string | null; nameNorm: string; citySlug: string | null }): string {
+export function makeDedupKey(input: {
+  phoneE164: string | null;
+  websiteHost: string | null;
+  nameNorm: string;
+  citySlug: string | null;
+}): string {
   if (input.phoneE164) return `phone:${input.phoneE164}`;
   if (input.websiteHost) return `web:${input.websiteHost}`;
   return `name-city:${input.nameNorm}:${input.citySlug ?? "unknown"}`;

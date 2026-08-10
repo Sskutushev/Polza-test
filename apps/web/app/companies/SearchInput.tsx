@@ -15,7 +15,9 @@ export function SearchInput() {
       if (value) next.set("q", value);
       else next.delete("q");
       next.delete("page");
-      startTransition(() => router.replace(`/companies?${next.toString()}`, { scroll: false }));
+      startTransition(() =>
+        router.replace(`/companies?${next.toString()}`, { scroll: false }),
+      );
     }, 300);
     return () => window.clearTimeout(timer);
   }, [params, router, value]);
@@ -23,7 +25,11 @@ export function SearchInput() {
   return (
     <label>
       Поиск
-      <input value={value} onChange={(event) => setValue(event.target.value)} placeholder="Название компании" />
+      <input
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder="Название компании"
+      />
     </label>
   );
 }

@@ -8,7 +8,7 @@ export const companyQuerySchema = z.object({
   sort: z.enum(["name", "rating", "reviews"]).optional().default("name"),
   dir: z.enum(["asc", "desc"]).optional().default("asc"),
   page: z.coerce.number().int().min(1).optional().default(1),
-  limit: z.coerce.number().int().min(1).max(100).optional().default(25)
+  limit: z.coerce.number().int().min(1).max(100).optional().default(25),
 });
 
 export type CompanyQuery = z.infer<typeof companyQuerySchema>;
@@ -28,10 +28,12 @@ export type CompanyRow = {
 const sortColumns = {
   name: "company.name_norm",
   rating: "company.rating",
-  reviews: "company.reviews_count"
+  reviews: "company.reviews_count",
 } as const;
 
-export async function findCompanies(input: Partial<CompanyQuery>): Promise<{ rows: CompanyRow[]; total: number }> {
+export async function findCompanies(
+  input: Partial<CompanyQuery>,
+): Promise<{ rows: CompanyRow[]; total: number }> {
   const params = companyQuerySchema.parse(input);
   const pool = createPool();
   const values: unknown[] = [];
@@ -85,11 +87,12 @@ export async function findCompanies(input: Partial<CompanyQuery>): Promise<{ row
         category: row.category,
         city: row.city,
         rating: row.rating == null ? null : Number(row.rating),
-        reviewsCount: row.reviews_count == null ? null : Number(row.reviews_count),
+        reviewsCount:
+          row.reviews_count == null ? null : Number(row.reviews_count),
         websiteHost: row.website_host,
         website: row.website,
-        phoneE164: row.phone_e164
-      }))
+        phoneE164: row.phone_e164,
+      })),
     };
   } finally {
     await pool.end();

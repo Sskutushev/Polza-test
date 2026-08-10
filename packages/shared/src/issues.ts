@@ -15,7 +15,7 @@ export const issueDescriptions = {
   DUP_FUZZY: "Potential fuzzy duplicate",
   ORPHAN_COMPANY_REF: "Review cannot be linked to a company",
   CSV_BAD_COLUMN_COUNT: "CSV row has unexpected column count",
-  DATE_INVALID: "Date cannot be parsed"
+  DATE_INVALID: "Date cannot be parsed",
 } as const;
 
 export type IssueCode = keyof typeof issueDescriptions;
