@@ -1,5 +1,6 @@
 import pg from "pg";
 import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 const { Pool } = pg;
 
@@ -19,8 +20,9 @@ let envLoaded = false;
 function loadLocalEnv(): void {
   if (envLoaded || process.env.DATABASE_URL) return;
   envLoaded = true;
-  if (!existsSync(".env")) return;
-  const lines = readFileSync(".env", "utf8").split(/\r?\n/);
+  const envPath = findEnvPath();
+  if (!envPath) return;
+  const lines = readFileSync(envPath, "utf8").split(/\r?\n/);
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
@@ -30,4 +32,16 @@ function loadLocalEnv(): void {
     const value = trimmed.slice(index + 1);
     process.env[key] ??= value;
   }
+}
+
+function findEnvPath(): string | null {
+  let current = process.cwd();
+  for (let depth = 0; depth < 5; depth += 1) {
+    const candidate = join(current, ".env");
+    if (existsSync(candidate)) return candidate;
+    const parent = dirname(current);
+    if (parent === current) return null;
+    current = parent;
+  }
+  return null;
 }

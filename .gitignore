@@ -11,3 +11,5 @@ data/*
 !data/README.md
 dist
 *.tsbuildinfo
+.next-dev.pid
+.next-dev.port
