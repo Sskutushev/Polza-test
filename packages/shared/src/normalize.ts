@@ -1,5 +1,7 @@
 import { fail, ok, type Parsed } from "./result.js";
 
+import iconv from "iconv-lite";
+
 const emptyTokens = new Set(["", "-", "—", "n/a", "na", "null", "none", "нет"]);
 const roleLocalParts = new Set([
   "info",
@@ -47,8 +49,20 @@ export function cleanText(raw: unknown): string | null {
     .replace(/\u00A0/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  if (emptyTokens.has(value.toLowerCase())) return null;
-  return value;
+  const repaired = repairMojibake(value);
+  if (emptyTokens.has(repaired.toLowerCase())) return null;
+  return repaired;
+}
+
+export function repairMojibake(value: string): string {
+  if (!/[РС][\u0080-\u04ff]|В[«»]|\u00c2|\u00d0|\u00d1/.test(value))
+    return value;
+  try {
+    const repaired = iconv.decode(iconv.encode(value, "win1251"), "utf8");
+    return repaired.includes("�") ? value : repaired;
+  } catch {
+    return value;
+  }
 }
 
 export function normalizeName(

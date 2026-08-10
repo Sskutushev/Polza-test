@@ -9,6 +9,7 @@ playwright-report
 test-results
 data/*
 !data/README.md
+data_pack.zip
 dist
 *.tsbuildinfo
 .next-dev.pid

@@ -195,6 +195,29 @@ async function loadReviews(file: string): Promise<void> {
   let inserted = 0;
   let rejected = 0;
   try {
+    if (!looksLikeReviewExport(rows)) {
+      for (const row of rows) {
+        rejected += 1;
+        await pool.query(
+          "INSERT INTO review_quarantine(run_id, payload, code, message) VALUES($1,$2,$3,$4)",
+          [
+            runId,
+            row,
+            "REVIEW_NOT_A_REVIEW_EXPORT",
+            "CSV has company-shaped columns and no review text/email/date columns",
+          ],
+        );
+      }
+      await pool.query(
+        "UPDATE ingest_run SET status='success', finished_at=now(), rows_inserted=$1, rows_rejected=$2 WHERE id=$3",
+        [inserted, rejected, runId],
+      );
+      console.log(
+        `reviews read=${rows.length} inserted=${inserted} rejected=${rejected}`,
+      );
+      return;
+    }
+
     for (const row of rows) {
       const companyName = cleanText(
         row.company ?? row.company_name ?? row.name,
@@ -263,6 +286,19 @@ async function loadReviews(file: string): Promise<void> {
   } finally {
     await pool.end();
   }
+}
+
+function looksLikeReviewExport(rows: JsonRecord[]): boolean {
+  const headers = new Set(
+    Object.keys(rows[0] ?? {}).map((header) => header.toLowerCase()),
+  );
+  const hasReviewText = ["text", "body", "review", "comment", "message"].some(
+    (header) => headers.has(header),
+  );
+  const hasReviewer = ["author", "email", "user", "reviewer"].some((header) =>
+    headers.has(header),
+  );
+  return hasReviewText || hasReviewer;
 }
 
 async function profileCsv(file: string): Promise<void> {

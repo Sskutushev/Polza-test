@@ -14,6 +14,7 @@ export const issueDescriptions = {
   DUP_EXACT: "Exact duplicate row",
   DUP_FUZZY: "Potential fuzzy duplicate",
   ORPHAN_COMPANY_REF: "Review cannot be linked to a company",
+  REVIEW_NOT_A_REVIEW_EXPORT: "CSV shape does not look like a review export",
   CSV_BAD_COLUMN_COUNT: "CSV row has unexpected column count",
   DATE_INVALID: "Date cannot be parsed",
 } as const;

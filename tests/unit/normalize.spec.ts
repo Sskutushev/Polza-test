@@ -5,6 +5,7 @@ import {
   normalizePhone,
   normalizeRating,
   normalizeWebsite,
+  repairMojibake,
 } from "@polza/shared";
 
 describe("normalizers", () => {
@@ -12,6 +13,12 @@ describe("normalizers", () => {
     const result = normalizeName(" ООО «Ромашка» ");
     expect(result.value?.name).toBe("ООО «Ромашка»");
     expect(result.value?.nameNorm).toBe("ромашка");
+  });
+
+  it("repairs utf8 text decoded as cp1251", () => {
+    expect(repairMojibake("РћРћРћ В«РџСЂР°Р№Рј РњРµРґРёР°В»")).toBe(
+      "ООО «Прайм Медиа»",
+    );
   });
 
   it("parses comma ratings", () => {
