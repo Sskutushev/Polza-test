@@ -18,11 +18,15 @@ export type CompanyRow = {
   name: string;
   category: string | null;
   city: string | null;
+  address: string | null;
   rating: number | null;
   reviewsCount: number | null;
   websiteHost: string | null;
   website: string | null;
   phoneE164: string | null;
+  sourceId: string | null;
+  sourceFile: string | null;
+  sourceIndex: number | null;
   outreachScore: number;
   dataCompleteness: number;
 };
@@ -81,11 +85,15 @@ export async function findCompanies(
         company.name,
         category.name AS category,
         city.name AS city,
+        company.address,
         company.rating,
         company.reviews_count,
         company.website_host,
         company.website,
         company.phone_e164,
+        company.source_id,
+        company.source_file,
+        company.source_index,
         (
           CASE WHEN company.website_host IS NOT NULL THEN 25 ELSE 0 END +
           CASE WHEN company.phone_e164 IS NOT NULL THEN 20 ELSE 0 END +
@@ -119,12 +127,16 @@ export async function findCompanies(
         name: String(row.name),
         category: row.category,
         city: row.city,
+        address: row.address,
         rating: row.rating == null ? null : Number(row.rating),
         reviewsCount:
           row.reviews_count == null ? null : Number(row.reviews_count),
         websiteHost: row.website_host,
         website: row.website,
         phoneE164: row.phone_e164,
+        sourceId: row.source_id,
+        sourceFile: row.source_file,
+        sourceIndex: row.source_index == null ? null : Number(row.source_index),
         outreachScore: Number(row.outreach_score ?? 0),
         dataCompleteness: Math.round((Number(row.completeness ?? 0) / 8) * 100),
       })),

@@ -6,6 +6,7 @@ import {
   getCompanyStats,
 } from "@polza/db/companies";
 import { CompanyControls } from "./CompanyControls";
+import { CompanyTable } from "./CompanyTable";
 import { messages, parseLang } from "./i18n";
 
 export const dynamic = "force-dynamic";
@@ -83,53 +84,7 @@ export default async function CompaniesPage({ searchParams }: PageProps) {
           <Link href={`/companies?lang=${lang}`}>{t.reset}</Link>
         </div>
       ) : (
-        <section className="company-list">
-          <table>
-            <caption>{t.tableCaption}</caption>
-            <thead>
-              <tr>
-                <th>{t.name}</th>
-                <th>{t.category}</th>
-                <th>{t.city}</th>
-                <th>{t.rating}</th>
-                <th>{t.reviews}</th>
-                <th>{t.site}</th>
-                <th>{t.phone}</th>
-                <th>{t.score}</th>
-                <th>{t.completeness}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.rows.map((company) => (
-                <tr key={company.id}>
-                  <td>
-                    <strong>{company.name}</strong>
-                  </td>
-                  <td>{company.category ?? "—"}</td>
-                  <td>{company.city ?? "—"}</td>
-                  <td className="num">{company.rating?.toFixed(1) ?? "—"}</td>
-                  <td className="num">{company.reviewsCount ?? "—"}</td>
-                  <td>
-                    {company.website ? (
-                      <a href={company.website} rel="noopener noreferrer">
-                        {company.websiteHost}
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="num">{company.phoneE164 ?? "—"}</td>
-                  <td>
-                    <Progress value={company.outreachScore} />
-                  </td>
-                  <td>
-                    <Progress value={company.dataCompleteness} muted />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        <CompanyTable rows={result.rows} messages={t} />
       )}
 
       <nav className="pagination">
@@ -157,22 +112,6 @@ function Metric({ label, value }: { label: string; value: string }) {
       <span>{label}</span>
       <strong className="num">{value}</strong>
     </article>
-  );
-}
-
-function Progress({
-  value,
-  muted = false,
-}: {
-  value: number;
-  muted?: boolean;
-}) {
-  const width = Math.max(0, Math.min(100, value));
-  return (
-    <span className={muted ? "progress muted-progress" : "progress"}>
-      <span style={{ width: `${width}%` }} />
-      <em className="num">{value}</em>
-    </span>
   );
 }
 
