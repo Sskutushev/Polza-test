@@ -9,8 +9,16 @@ type CompanyTableProps = {
   messages: Messages;
 };
 
+type ModalMode = "profile" | "reviews";
+
 export function CompanyTable({ rows, messages }: CompanyTableProps) {
   const [selected, setSelected] = useState<CompanyRow | null>(null);
+  const [mode, setMode] = useState<ModalMode>("profile");
+
+  function openModal(company: CompanyRow, nextMode: ModalMode): void {
+    setSelected(company);
+    setMode(nextMode);
+  }
 
   return (
     <>
@@ -41,7 +49,15 @@ export function CompanyTable({ rows, messages }: CompanyTableProps) {
                 <td>{company.category ?? "—"}</td>
                 <td>{company.city ?? "—"}</td>
                 <td className="num">{company.rating?.toFixed(1) ?? "—"}</td>
-                <td className="num">{company.reviewsCount ?? "—"}</td>
+                <td>
+                  <button
+                    className="text-button num"
+                    type="button"
+                    onClick={() => openModal(company, "reviews")}
+                  >
+                    {company.reviewsCount ?? "—"}
+                  </button>
+                </td>
                 <td>
                   <Progress value={company.outreachScore} />
                 </td>
@@ -49,7 +65,10 @@ export function CompanyTable({ rows, messages }: CompanyTableProps) {
                   <Progress value={company.dataCompleteness} muted />
                 </td>
                 <td className="row-action">
-                  <button type="button" onClick={() => setSelected(company)}>
+                  <button
+                    type="button"
+                    onClick={() => openModal(company, "profile")}
+                  >
                     {messages.openProfile}
                   </button>
                 </td>
@@ -63,6 +82,7 @@ export function CompanyTable({ rows, messages }: CompanyTableProps) {
         <CompanyModal
           company={selected}
           messages={messages}
+          initialMode={mode}
           onClose={() => setSelected(null)}
         />
       ) : null}
@@ -73,12 +93,16 @@ export function CompanyTable({ rows, messages }: CompanyTableProps) {
 function CompanyModal({
   company,
   messages,
+  initialMode,
   onClose,
 }: {
   company: CompanyRow;
   messages: Messages;
+  initialMode: ModalMode;
   onClose: () => void;
 }) {
+  const [activeMode, setActiveMode] = useState<ModalMode>(initialMode);
+
   return (
     <div className="modal-backdrop" role="presentation" onClick={onClose}>
       <section
@@ -98,56 +122,130 @@ function CompanyModal({
           </button>
         </header>
 
-        <div className="modal-score-grid">
-          <ScoreBlock label={messages.priority} value={company.outreachScore} />
-          <ScoreBlock
-            label={messages.quality}
-            value={company.dataCompleteness}
-            muted
-          />
+        <div className="modal-tabs" role="tablist">
+          <button
+            className={activeMode === "profile" ? "active-tab" : ""}
+            type="button"
+            onClick={() => setActiveMode("profile")}
+          >
+            {messages.profile}
+          </button>
+          <button
+            className={activeMode === "reviews" ? "active-tab" : ""}
+            type="button"
+            onClick={() => setActiveMode("reviews")}
+          >
+            {messages.reviewsBlock}
+          </button>
         </div>
 
-        <div className="detail-grid">
-          <Detail label={messages.category} value={company.category} />
-          <Detail label={messages.city} value={company.city} />
-          <Detail label={messages.address} value={company.address} />
-          <Detail label={messages.rating} value={company.rating?.toFixed(1)} />
-          <Detail
-            label={messages.reviews}
-            value={company.reviewsCount?.toString()}
-          />
-        </div>
-
-        <h3>{messages.contactData}</h3>
-        <div className="detail-grid">
-          <Detail
-            label={messages.site}
-            value={
-              company.website ? (
-                <a
-                  href={company.website}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {company.websiteHost}
-                </a>
-              ) : null
-            }
-          />
-          <Detail label={messages.phone} value={company.phoneE164} />
-        </div>
-
-        <h3>{messages.sourceData}</h3>
-        <div className="detail-grid">
-          <Detail label={messages.sourceId} value={company.sourceId} />
-          <Detail label={messages.sourceFile} value={company.sourceFile} />
-          <Detail
-            label={messages.sourceIndex}
-            value={company.sourceIndex?.toString()}
-          />
-        </div>
+        {activeMode === "profile" ? (
+          <ProfilePanel company={company} messages={messages} />
+        ) : (
+          <ReviewsPanel company={company} messages={messages} />
+        )}
       </section>
     </div>
+  );
+}
+
+function ProfilePanel({
+  company,
+  messages,
+}: {
+  company: CompanyRow;
+  messages: Messages;
+}) {
+  return (
+    <>
+      <div className="modal-score-grid">
+        <ScoreBlock label={messages.priority} value={company.outreachScore} />
+        <ScoreBlock
+          label={messages.quality}
+          value={company.dataCompleteness}
+          muted
+        />
+      </div>
+
+      <div className="detail-grid">
+        <Detail label={messages.category} value={company.category} />
+        <Detail label={messages.city} value={company.city} />
+        <Detail label={messages.address} value={company.address} />
+        <Detail label={messages.rating} value={company.rating?.toFixed(1)} />
+        <Detail
+          label={messages.reviews}
+          value={company.reviewsCount?.toString()}
+        />
+      </div>
+
+      <h3>{messages.contactData}</h3>
+      <div className="detail-grid">
+        <Detail
+          label={messages.site}
+          value={
+            company.website ? (
+              <a
+                href={company.website}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {company.websiteHost}
+              </a>
+            ) : null
+          }
+        />
+        <Detail label={messages.phone} value={company.phoneE164} />
+      </div>
+
+      <h3>{messages.sourceData}</h3>
+      <div className="detail-grid">
+        <Detail label={messages.sourceId} value={company.sourceId} />
+        <Detail label={messages.sourceFile} value={company.sourceFile} />
+        <Detail
+          label={messages.sourceIndex}
+          value={company.sourceIndex?.toString()}
+        />
+      </div>
+    </>
+  );
+}
+
+function ReviewsPanel({
+  company,
+  messages,
+}: {
+  company: CompanyRow;
+  messages: Messages;
+}) {
+  return (
+    <section className="reviews-panel">
+      <div className="review-summary">
+        <Detail
+          label={messages.aggregateOnly}
+          value={company.reviewsCount?.toString()}
+        />
+      </div>
+
+      {company.recentReviews.length > 0 ? (
+        <div className="review-list">
+          {company.recentReviews.map((review, index) => (
+            <article key={`${review.reviewDate ?? "no-date"}-${index}`}>
+              <div>
+                <strong>{review.author ?? messages.reviewsBlock}</strong>
+                <span className="num">{review.rating?.toFixed(1) ?? "—"}</span>
+              </div>
+              <p>{review.body ?? "—"}</p>
+              <small>{review.reviewDate ?? review.emailStatus ?? "—"}</small>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="reviews-empty">
+          <strong>{messages.reviewsUnavailable}</strong>
+          <p>{messages.aggregateOnly}</p>
+        </div>
+      )}
+    </section>
   );
 }
 

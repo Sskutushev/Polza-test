@@ -29,6 +29,15 @@ export type CompanyRow = {
   sourceIndex: number | null;
   outreachScore: number;
   dataCompleteness: number;
+  recentReviews: CompanyReview[];
+};
+
+export type CompanyReview = {
+  author: string | null;
+  emailStatus: string | null;
+  rating: number | null;
+  body: string | null;
+  reviewDate: string | null;
 };
 
 export type CompanyFacet = {
@@ -94,6 +103,7 @@ export async function findCompanies(
         company.source_id,
         company.source_file,
         company.source_index,
+        coalesce(recent_reviews.items, '[]'::json) AS recent_reviews,
         (
           CASE WHEN company.website_host IS NOT NULL THEN 25 ELSE 0 END +
           CASE WHEN company.phone_e164 IS NOT NULL THEN 20 ELSE 0 END +
@@ -114,6 +124,25 @@ export async function findCompanies(
       FROM company
       LEFT JOIN category ON category.id = company.category_id
       LEFT JOIN city ON city.id = company.city_id
+      LEFT JOIN LATERAL (
+        SELECT json_agg(
+          json_build_object(
+            'author', review.author,
+            'emailStatus', review.email_status,
+            'rating', review.rating,
+            'body', review.body,
+            'reviewDate', review.review_date
+          )
+          ORDER BY review.review_date DESC NULLS LAST, review.id DESC
+        ) AS items
+        FROM (
+          SELECT *
+          FROM review
+          WHERE review.company_id = company.id
+          ORDER BY review.review_date DESC NULLS LAST, review.id DESC
+          LIMIT 5
+        ) review
+      ) recent_reviews ON true
       ${whereSql}
       ORDER BY ${orderColumn} ${orderDir} NULLS LAST, company.id ASC
       LIMIT $${values.length - 1} OFFSET $${values.length}
@@ -139,11 +168,26 @@ export async function findCompanies(
         sourceIndex: row.source_index == null ? null : Number(row.source_index),
         outreachScore: Number(row.outreach_score ?? 0),
         dataCompleteness: Math.round((Number(row.completeness ?? 0) / 8) * 100),
+        recentReviews: parseRecentReviews(row.recent_reviews),
       })),
     };
   } finally {
     await pool.end();
   }
+}
+
+function parseRecentReviews(value: unknown): CompanyReview[] {
+  const rows = Array.isArray(value) ? value : [];
+  return rows.map((row) => {
+    const item = row as Record<string, unknown>;
+    return {
+      author: item.author == null ? null : String(item.author),
+      emailStatus: item.emailStatus == null ? null : String(item.emailStatus),
+      rating: item.rating == null ? null : Number(item.rating),
+      body: item.body == null ? null : String(item.body),
+      reviewDate: item.reviewDate == null ? null : String(item.reviewDate),
+    };
+  });
 }
 
 export async function getCompanyFacets(): Promise<{

@@ -17,4 +17,13 @@ test.describe("companies", () => {
     await expect(page.getByText("Контакты")).toBeVisible();
     await expect(page.getByText("Источник")).toBeVisible();
   });
+
+  test("opens reviews panel from reviews count", async ({ page }) => {
+    await page.goto("/companies");
+    await page.getByRole("button", { name: /^\d+$/ }).first().click();
+    await expect(
+      page.getByRole("dialog", { name: "Профиль компании" }),
+    ).toBeVisible();
+    await expect(page.getByText("Тексты отзывов не загружены")).toBeVisible();
+  });
 });

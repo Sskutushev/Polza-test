@@ -321,6 +321,21 @@ tbody tr:hover {
   color: #fff;
 }
 
+.text-button {
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--accent);
+  padding: 6px 10px;
+  font-weight: 800;
+}
+
+.text-button:hover {
+  background: rgba(15, 118, 110, 0.14);
+}
+
 .num {
   font-variant-numeric: tabular-nums;
 }
@@ -444,6 +459,29 @@ tbody tr:hover {
   line-height: 1.1;
 }
 
+.modal-tabs {
+  display: inline-flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: #eef4f8;
+  padding: 4px;
+}
+
+.modal-tabs button {
+  width: auto;
+  min-width: 128px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.modal-tabs .active-tab {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 6px 16px rgba(20, 32, 46, 0.08);
+}
+
 .modal-score-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -488,6 +526,44 @@ tbody tr:hover {
 .company-modal h3 {
   margin: 22px 0 10px;
   font-size: 15px;
+}
+
+.reviews-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.review-summary {
+  max-width: 280px;
+}
+
+.review-list {
+  display: grid;
+  gap: 10px;
+}
+
+.review-list article,
+.reviews-empty {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fbfdff;
+  padding: 14px;
+}
+
+.review-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.review-list p {
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.review-list small,
+.reviews-empty p {
+  color: var(--muted);
 }
 
 @keyframes fade {
