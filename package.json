@@ -1,0 +1,47 @@
+{
+  "name": "polza-tech-task",
+  "private": true,
+  "packageManager": "pnpm@10.25.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @polza/web dev",
+    "build": "pnpm --filter @polza/web build",
+    "lint": "eslint .",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:api": "vitest run tests/api",
+    "test:component": "vitest run tests/component",
+    "test:e2e": "playwright test",
+    "test:perf": "vitest run tests/perf",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test",
+    "migrate": "tsx packages/db/src/migrate.ts",
+    "load:companies": "tsx packages/ingest/src/cli.ts companies",
+    "load:reviews": "tsx packages/ingest/src/cli.ts reviews",
+    "profile:csv": "tsx packages/ingest/src/cli.ts profile-csv"
+  },
+  "dependencies": {
+    "@polza/db": "workspace:*",
+    "@polza/shared": "workspace:*",
+    "csv-parse": "^5.6.0",
+    "next": "^15.4.6",
+    "pg": "^8.13.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^22.13.14",
+    "@types/pg": "^8.11.11",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.32.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.39.0",
+    "vitest": "^3.2.4"
+  }
+}
