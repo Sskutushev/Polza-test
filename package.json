@@ -21,6 +21,7 @@
     "migrate": "tsx packages/db/src/migrate.ts",
     "migrations": "tsx packages/db/src/migrate.ts",
     "migrations:check": "tsx packages/db/src/migrate.ts",
+    "seed:demo": "tsx packages/db/src/seed-demo.ts",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "load:companies": "tsx packages/ingest/src/cli.ts companies",

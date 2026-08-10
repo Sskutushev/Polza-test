@@ -4,11 +4,20 @@
 
 ```bash
 cp .env.example .env
-make up && make migrate && make load
+make up && make migrate
+npm run seed:demo
 pnpm dev
 ```
 
 Open http://localhost:3000/companies.
+
+If port 3000 is busy, run:
+
+```bash
+npm run dev -- -p 3011
+```
+
+Open http://127.0.0.1:3011/companies.
 
 ## What Is Implemented
 
@@ -17,6 +26,9 @@ Open http://localhost:3000/companies.
 - Shared normalization and validation in `packages/shared`
 - JSON company loader and `review.csv` loader/profiler in `packages/ingest`
 - Next.js `/companies` page and `/api/companies`
+- RU/EN/ZH UI language switch through `?lang=ru|en|zh`
+- Operator dashboard metrics, outreach score, data completeness indicators
+- Demo seed for local visual verification without the real archive
 - Unit/integration/API/component/perf/E2E test placeholders and docs
 
 ## Data
@@ -34,6 +46,12 @@ pnpm profile:csv -- --file ./data/review.csv
 pnpm load:reviews -- --file ./data/review.csv
 ```
 
+For local UI review before receiving the archive:
+
+```bash
+npm run seed:demo
+```
+
 ## Verification
 
 ```bash
@@ -41,3 +59,15 @@ pnpm verify
 ```
 
 See `docs/TESTING.md`, `docs/DATA_REPORT.md`, `docs/ANOMALIES.md`, and `docs/VERIFICATION.md`.
+
+## Codex Quality Chain
+
+The required local chain is documented in `AGENTS.md`:
+
+```bash
+npm run eslint
+npm run typecheck
+npm run test
+npm run migrations
+npm run format
+```

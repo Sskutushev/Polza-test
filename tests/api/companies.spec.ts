@@ -9,4 +9,9 @@ describe("company query contract", () => {
   it("defaults pagination", () => {
     expect(companyQuerySchema.parse({}).page).toBe(1);
   });
+
+  it("allows business sorting modes", () => {
+    expect(companyQuerySchema.parse({ sort: "rating" }).sort).toBe("rating");
+    expect(companyQuerySchema.parse({ sort: "reviews" }).sort).toBe("reviews");
+  });
 });
